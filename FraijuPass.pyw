@@ -13,6 +13,18 @@ _paused=False
 _quit=False
 
 #Functions
+def calculateTrys():
+	while True:
+		global _trys
+		prevTrys = _trys
+		time.sleep(1)
+		trysPerSec = _trys - prevTrys
+		lblText = str(trysPerSec) + " (req/s)"
+		lblTrysPerSec.config(text=lblText)
+		if _done or _quit:
+			lblTrysPerSec.config(text="")
+			break
+
 def licenseFunc():
     messagebox.showinfo("License", "This application is an open source product.\n\nHas no Copyright")
 
@@ -84,6 +96,8 @@ def getCreds():
 	global _done
 	global _trys
 	
+	threading._start_new_thread(calculateTrys)
+
 	_done=False
 	_trys=0
 
@@ -197,7 +211,11 @@ progress["value"] = 0
 
 lblTrys=Label(mainFrame)
 lblTrys.config(fg="blue")
-lblTrys.grid(row=3, column=3)
+lblTrys.grid(row=3, column=3, sticky="W")
+
+lblTrysPerSec=Label(mainFrame)
+lblTrysPerSec.config(fg="blue")
+lblTrysPerSec.grid(row=3, column=3, sticky="E")
 
 Button(mainFrame, text="START", command=getCreds).grid(row=4, column=0, sticky="W")
 
