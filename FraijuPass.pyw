@@ -5,6 +5,7 @@ import threading
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
+from tkinter import filedialog
 
 #globals
 _trys=0
@@ -30,6 +31,9 @@ def licenseFunc():
 
 def aboutFunc():
     messagebox.showinfo("About", "FraijuPass\nUse it in your own risk\nBy: HackSh00t")
+
+def versionFunc():
+	messagebox.showinfo("Version", "Version:\nbeta-a16")
 
 def exitApp():
     exitval=messagebox.askquestion("Exit", "Do you want to exit the application?")
@@ -146,6 +150,53 @@ def setQuit():
 	lblError.config(text="")
 	_quit=False
 
+def recursiveMode():
+	#Funcs
+	def openFile():
+		openFileDialog=filedialog.askopenfilename(initialdir="/", title="Select file to open", filetypes=(("list files","*.list"), ("all files", "*.*")))
+		varOpen.set(openFileDialog)
+
+	def saveFile():
+		saveFileDialog=filedialog.asksaveasfilename(initialdir="/", title="Select file to save", filetypes=(("list files","*.list"), ("all files", "*.*")))
+		varSave.set(saveFileDialog)
+
+	def startRecursive():
+		pass
+
+    #MainRecursive configuration
+	rootRecursive=Tk()
+	rootRecursive.title("Recursive Mode")
+	rootRecursive.config(width=400, height=400)
+	rootRecursive.resizable(False, False)
+
+	mainRecursiveFrame=Frame(rootRecursive)
+	mainRecursiveFrame.pack()
+	mainRecursiveFrame.config(width=400, height=400)
+
+	#Vars
+	varOpen=StringVar(rootRecursive)
+	varSave=StringVar(rootRecursive)
+
+	#mainRecursiveFrame items
+	Label(mainRecursiveFrame, text="Open File: ").grid(row=0, column=0)
+	txtOpen=Entry(mainRecursiveFrame)
+	txtOpen.config(fg="blue", state="disabled", textvariable=varOpen)
+	txtOpen.grid(row=0, column=1)
+	Button(mainRecursiveFrame, text="Open", command=openFile).grid(row=0, column=2)
+
+	Label(mainRecursiveFrame, text="Save File: ").grid(row=1, column=0)
+	txtSave=Entry(mainRecursiveFrame)
+	txtSave.config(fg="blue", state="disabled", textvariable=varSave)
+	txtSave.grid(row=1, column=1)
+	Button(mainRecursiveFrame, text="Save", command=saveFile).grid(row=1, column=2)
+
+	Button(mainRecursiveFrame, text="START", command=startRecursive).grid(row=2, column=0)
+
+	lblStatus=Label(mainRecursiveFrame)
+	lblStatus.grid(row=2, column=1, columnspan=2)
+
+	rootRecursive.mainloop()
+
 #Main Frame configuration
 root=Tk()
 root.title("FraijuPass")
@@ -169,11 +220,14 @@ MenuBar=Menu(root)
 root.config(menu=MenuBar)
 
 FileBar=Menu(MenuBar, tearoff=0)
+FileBar.add_command(label="Recursive", command=recursiveMode)
+FileBar.add_separator()
 FileBar.add_command(label="Exit", command=exitApp)
 
 HelpBar=Menu(MenuBar, tearoff=0)
 HelpBar.add_command(label="License", command=licenseFunc)
 HelpBar.add_command(label="About", command=aboutFunc)
+HelpBar.add_command(label="Version", command=versionFunc)
 
 MenuBar.add_cascade(label="Files", menu=FileBar)
 MenuBar.add_cascade(label="Help", menu=HelpBar)
