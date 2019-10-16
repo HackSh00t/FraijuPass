@@ -100,7 +100,7 @@ def getCreds():
 	global _done
 	global _trys
 	
-	threading._start_new_thread(calculateTrys)
+	threading._start_new_thread(calculateTrys, ())
 
 	_done=False
 	_trys=0
