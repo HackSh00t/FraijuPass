@@ -24,6 +24,7 @@ def calculateTrys():
 		lblTrysPerSec.config(text=lblText)
 		if _done or _quit:
 			lblTrysPerSec.config(text="")
+			lblTrys.config(text="")
 			break
 
 def licenseFunc():
@@ -140,9 +141,11 @@ def setQuit():
 	for i in range(4):
 		lblError.config(text="Quitting...")
 		root.update()
+		_quit=True
 		time.sleep(2.5)
 		lblError.config(text="Whait...")
 		root.update()
+		_quit=True
 		time.sleep(2.5)
 	
 	progress["value"] = 0
