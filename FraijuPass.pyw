@@ -365,6 +365,7 @@ def openFile():
 			pyperclip.copy(credIndex[1])
 
 		rootOpen.update()
+		time.sleep(0.1)
 
 	rootOpen.mainloop()
 
