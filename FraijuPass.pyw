@@ -1,7 +1,10 @@
 import os
 import PassBrute
 import time
+import webbrowser
+import pyperclip
 import threading
+import tkinter.ttk
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
@@ -34,7 +37,7 @@ def aboutFunc():
     messagebox.showinfo("About", "FraijuPass\nUse it in your own risk\nBy: HackSh00t")
 
 def versionFunc():
-	messagebox.showinfo("Version", "Version:\nbeta-a16")
+	messagebox.showinfo("Version", "Version:\nbeta-a24")
 
 def exitApp():
     exitval=messagebox.askquestion("Exit", "Do you want to exit the application?")
@@ -300,6 +303,71 @@ def recursiveMode():
 
 	rootRecursive.mainloop()
 
+def openFile():
+	openFileDialog=filedialog.askopenfilename(initialdir="/", title="Select file to open", filetypes=(("list files","*.list"), ("all files", "*.*")))
+
+	fileReader=open(openFileDialog, mode="r")
+	fileContent=fileReader.read()
+
+	memoryChars=""
+	credList=[]
+	for i in fileContent:
+		if i == "\n":
+			credList.append(memoryChars)
+			memoryChars=""
+		else:
+			memoryChars+=str(i)
+
+	credDic={}
+	for i in credList:
+		try:
+			mail, passwd = i.split(":")
+			credDic[mail] = passwd
+		except:
+			pass
+
+	#Open Frame configuration
+	rootOpen=Tk()
+	rootOpen.title("Open File")
+	rootOpen.config(width=400, height=400)
+	rootOpen.resizable(False, False)
+
+	#credTable configuration
+	credTable=tkinter.ttk.Treeview(rootOpen)
+
+	credTable["columns"]=("EMAIL", "PASSWORD")
+	credTable.column("#0", width=50)
+	credTable.column("EMAIL", width=150)
+	credTable.column("PASSWORD", width=100)
+	credTable.heading("#0", text="ID")
+	credTable.heading("EMAIL", text="EMAIL")
+	credTable.heading("PASSWORD", text="PASSWORD")
+
+	count=0
+	for i in credDic:
+		credTable.insert("", count, text=str(count), values=(i, credDic[i]))
+		count+=1
+
+	credTable.pack()
+
+	#Code
+	while True:
+		openCred=list(credTable.selection())
+		
+		if openCred != []:
+			credIndex=credTable.item(openCred[0])['values']
+			print(credIndex)
+			credTable.selection_remove(openCred[0])
+
+			URL="https://elearning17.hezkuntza.net/015307/login/index.php?username=" + credIndex[0]
+			webbrowser.open_new_tab(URL)
+
+			pyperclip.copy(credIndex[1])
+
+		rootOpen.update()
+
+	rootOpen.mainloop()
+
 #Main Frame configuration
 root=Tk()
 root.title("FraijuPass")
@@ -323,6 +391,7 @@ MenuBar=Menu(root)
 root.config(menu=MenuBar)
 
 FileBar=Menu(MenuBar, tearoff=0)
+FileBar.add_command(label="Open", command=openFile)
 FileBar.add_command(label="Recursive", command=recursiveMode)
 FileBar.add_separator()
 FileBar.add_command(label="Exit", command=exitApp)
