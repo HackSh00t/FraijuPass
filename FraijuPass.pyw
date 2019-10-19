@@ -191,8 +191,25 @@ def recursiveMode():
 				if PassBrute.tryPass(mail, passToTry):
 					_done=True
 					passToWrite=mail+":"+passToTry+"\n"
-					writeFile=open(writeFileName, mode="a")
-					writeFile.write(passToWrite)
+					try:
+						writeFile=open(writeFileName, mode="r+")
+						content=writeFile.read()
+						writeFile.seek(0, 0)
+						writeFile.write(passToWrite + content)
+						writeFile.close()
+						del(writeFile)
+						break
+					except:
+						createFile=open(writeFileName, mode="w")
+						createFile.close()
+						del(createFile)
+						writeFile=open(writeFileName, mode="r+")
+						content=writeFile.read()
+						writeFile.seek(0, 0)
+						writeFile.write(passToWrite + content)
+						writeFile.close()
+						del(writeFile)
+						break
 					break
 
 				num+=1
@@ -203,12 +220,35 @@ def recursiveMode():
 		if _trys>=10000 and _done==False:
 			_done=True
 			unknownToWrite=mail+":"+"????????"+"\n"
-			writeFile=open(writeFileName, mode="a")
-			writeFile.write(unknownToWrite)
+			try:
+				writeFile=open(writeFileName, mode="r+")
+				content=writeFile.read()
+				writeFile.seek(0, 0)
+				writeFile.write(unknownToWrite + content)
+				writeFile.close()
+				del(writeFile)
+			except:
+				createFile=open(writeFileName, mode="w")
+				createFile.close()
+				del(createFile)
+				writeFile=open(writeFileName, mode="r+")
+				content=writeFile.read()
+				writeFile.seek(0, 0)
+				writeFile.write(unknownToWrite + content)
+				writeFile.close()
+				del(writeFile)
 
 	def fileInterpreter(fileName):
 		fileReader=open(fileName, mode="r")
 		fileContent=fileReader.read()
+
+		fileLen = len(fileContent) - 1
+
+		if fileContent[fileLen] != '\n':
+			fileCorrect=open(fileName, mode="a")
+			fileCorrect.write('\n')
+			fileCorrect.close()
+			del(fileCorrect)
 
 		memoryChars=""
 		emailList=[]
@@ -308,6 +348,14 @@ def openFile():
 
 	fileReader=open(openFileDialog, mode="r")
 	fileContent=fileReader.read()
+
+	fileLen = len(fileContent) - 1
+
+	if fileContent[fileLen] != '\n':
+		fileCorrect=open(openFileDialog, mode="a")
+		fileCorrect.write('\n')
+		fileCorrect.close()
+		del(fileCorrect)
 
 	memoryChars=""
 	credList=[]
