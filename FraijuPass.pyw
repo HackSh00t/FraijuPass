@@ -420,10 +420,21 @@ def openFile():
 def setTor():
 	#Funcs
 	def defUnsetTor():
-		pass
+		try:
+			os.remove("CONFIG_TOR.config")
+			lblTorStatus.config(text="Unset", fg="red")
+		except:
+			pass
 
 	def defTor():
-		pass
+		http=varHttp.get()
+		https=varHttps.get()
+		config=http+"$"+https
+
+		file=open("CONFIG_TOR.config", mode="w")
+		file.write(config)
+
+		lblTorStatus.config(text="Running", fg="green")
 
 	#rootTor configuration
 	rootTor=Tk()
@@ -445,12 +456,12 @@ def setTor():
 	#rootTor items
 	Label(mainTorFrame, text="HttpSocket:").grid(row=0, column=0)
 	txtHttp=Entry(mainTorFrame)
-	txtHttp.config(fg="blue", justify="center", textvariable="varHttp")
+	txtHttp.config(fg="blue", justify="center", textvariable=varHttp)
 	txtHttp.grid(row=0, column=1)
 
 	Label(mainTorFrame, text="HttpsSocket:").grid(row=1, column=0)
 	txtHttps=Entry(mainTorFrame)
-	txtHttps.config(fg="blue", justify="center", textvariable="varHttps")
+	txtHttps.config(fg="blue", justify="center", textvariable=varHttps)
 	txtHttps.grid(row=1, column=1)
 
 	Button(mainTorFrame, text="Set", command=defTor).grid(row=2, column=0)
