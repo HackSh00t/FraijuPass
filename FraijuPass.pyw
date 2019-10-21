@@ -417,6 +417,59 @@ def openFile():
 
 	rootOpen.mainloop()
 
+def setTor():
+	#Funcs
+	def defUnsetTor():
+		pass
+
+	def defTor():
+		pass
+
+	#rootTor configuration
+	rootTor=Tk()
+	rootTor.title("Tor configuration")
+	rootTor.config(width=400, height=400)
+	rootTor.resizable(False, False)
+
+	mainTorFrame=Frame(rootTor)
+	mainTorFrame.config(width=400, height=400)
+	mainTorFrame.pack()
+
+	#Vars
+	varHttp=StringVar(rootTor)
+	varHttp.set('socks5://127.0.0.1:9050')
+
+	varHttps=StringVar(rootTor)
+	varHttps.set('socks5://127.0.0.1:9050')
+
+	#rootTor items
+	Label(mainTorFrame, text="HttpSocket:").grid(row=0, column=0)
+	txtHttp=Entry(mainTorFrame)
+	txtHttp.config(fg="blue", justify="center", textvariable="varHttp")
+	txtHttp.grid(row=0, column=1)
+
+	Label(mainTorFrame, text="HttpsSocket:").grid(row=1, column=0)
+	txtHttps=Entry(mainTorFrame)
+	txtHttps.config(fg="blue", justify="center", textvariable="varHttps")
+	txtHttps.grid(row=1, column=1)
+
+	Button(mainTorFrame, text="Set", command=defTor).grid(row=2, column=0)
+	Button(mainTorFrame, text="Unset", command=defUnsetTor).grid(row=2, column=1, sticky='W')
+
+	lblTorStatus=Label(mainTorFrame)
+	lblTorStatus.grid(row=2, column=1, sticky='E', padx=30)
+
+	try:
+		f=open("CONFIG_TOR.config")
+		lblTorStatus.config(text="Running", fg="green")
+	except:
+		lblTorStatus.config(text="Unset", fg="red")
+	finally:
+		f.close()
+		del(f)
+
+	rootTor.mainloop()
+
 #Main Frame configuration
 root=Tk()
 root.title("FraijuPass")
@@ -442,6 +495,7 @@ root.config(menu=MenuBar)
 FileBar=Menu(MenuBar, tearoff=0)
 FileBar.add_command(label="Open", command=openFile)
 FileBar.add_command(label="Recursive", command=recursiveMode)
+FileBar.add_command(label="Tor", command=setTor)
 FileBar.add_separator()
 FileBar.add_command(label="Exit", command=exitApp)
 
